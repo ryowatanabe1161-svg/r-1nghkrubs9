@@ -146,6 +146,7 @@ details.alts summary::before{content:'▸ '}details.alts[open] summary::before{c
 .chip.ghost{background:#fff;border:1.5px dashed #bfe6d6}
 .wh{padding:8px 0;border-bottom:1px solid #eef1f0;cursor:pointer}.whh{display:flex;justify-content:space-between;font-size:14px}.whh span{font-size:12px;color:var(--sub)}
 .whl{display:flex;gap:8px;font-size:12px;padding:2px 0}.whl span{flex:none;max-width:45%;color:var(--txt)}.whl em{font-style:normal;color:var(--sub);flex:1;text-align:right}
+ul.ck li span.tip,.tip{display:block;font-size:11px;color:#8a7a55;background:#fff8e6;border-radius:8px;padding:3px 8px;margin-top:3px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -868,8 +869,8 @@ var SPL={A:{n:'胸・肩・三頭',ic:'💪',c:'a'},B:{n:'背中・二頭',ic:'�
 var MENUS={
 A:{beg:[['チェストプレス（マシン）','3セット×12回'],['ペックフライ（マシン）','3×12'],['ショルダープレス（マシン）','3×12'],['サイドレイズ（ダンベル）','3×15'],['トライセプスプッシュダウン（ケーブル）','3×12'],['仕上げ有酸素：ランニングマシン','傾斜8〜10%・時速5km 15分']],
    int:[['ベンチプレス','4×6〜8'],['インクラインダンベルプレス','3×8〜10'],['ケーブルクロスオーバー','3×12'],['ダンベルショルダープレス','4×8〜10'],['サイドレイズ','4×12〜15'],['スカルクラッシャー','3×10'],['仕上げ有酸素：バイクHIIT','20秒全力/40秒ゆっくり×8本']]},
-B:{beg:[['ラットプルダウン（マシン）','3×12'],['シーテッドロー（マシン）','3×12'],['バックエクステンション','3×15'],['ダンベルカール','3×12'],['ハンマーカール','3×12'],['仕上げ有酸素：バイク','中強度20分']],
-   int:[['デッドリフト','4×5'],['懸垂（アシスト可）','4×できるだけ'],['ベントオーバーロウ','4×8'],['ワンハンドダンベルロウ','3×10（左右）'],['バーベルカール','3×8〜10'],['インクラインダンベルカール','3×12'],['仕上げ有酸素：ランニングマシン','20分（会話できるペース）']]},
+B:{beg:[['ラットプルダウン（マシン）','3×12'],['シーテッドロー（マシン）','3×12'],['ダイバージング・ロー・ロウ（PRECOR）','3セット×12回（マシン）'],['バックエクステンション','3×15'],['ダンベルカール','3×12'],['ハンマーカール','3×12'],['仕上げ有酸素：バイク','中強度20分']],
+   int:[['デッドリフト','4×5'],['懸垂（アシスト可）','4×できるだけ'],['ダイバージング・ロー・ロウ（PRECOR）','4セット×10回（マシン）'],['ベントオーバーロウ','4×8'],['ワンハンドダンベルロウ','3×10（左右）'],['バーベルカール','3×8〜10'],['インクラインダンベルカール','3×12'],['仕上げ有酸素：ランニングマシン','20分（会話できるペース）']]},
 C:{beg:[['レッグプレス（マシン）','3×12'],['レッグエクステンション','3×12'],['レッグカール','3×12'],['アブドミナルクランチ（マシン）','3×15'],['プランク','3×30秒'],['仕上げ有酸素：ランニングマシン','ウォーク15分']],
    int:[['バーベルスクワット','4×6〜8'],['ルーマニアンデッドリフト','3×8'],['ブルガリアンスクワット','3×10（左右）'],['レッグカール','3×12'],['カーフレイズ','4×15'],['ハンギングレッグレイズ','3×12'],['仕上げ有酸素：バイク','15分']]},
 K:{beg:[['ウォームアップ：縄跳び','3分×2R'],['ストレッチ＋シャドー','2分×3R'],['ミット打ち','2分×3R'],['サンドバッグ','2分×3R'],['体幹：プランク','3×30秒'],['クールダウンストレッチ','5分']],
@@ -921,7 +922,7 @@ function trainTodayHTML(compact){var type=todayType(),S=SPL[type],m=menuFor(type
   if(!compact&&'ABC'.indexOf(type)>=0){var l=lastDone(today());
     h+='<div class="note" style="margin:6px 0">前回：胸・肩・三頭 '+daysAgo(l.A)+'／背中・二頭 '+daysAgo(l.B)+'／脚・腹 '+daysAgo(l.C)+'<br>→ 間隔がいちばん空いていて、前日と同じ部位にならない「'+S.n+'」を提案しています。</div>';}
   if(!compact){h+='<div class="chips" style="margin:6px 0 4px">'+['','A','B','C','K','R'].map(function(v){var on=v?db.plan.over[today()]===v:!db.plan.over[today()];return '<span class="chip'+(on?' son':'')+'" onclick="setOver(\''+v+'\')">'+(v?SPL[v].ic+' '+SPL[v].n:'✨ おまかせ')+'</span>';}).join('')+'</div>';}
-  h+='<ul class="ck">'+m.map(function(x,j){return '<li class="'+(c.d[j]?'on':'')+'" onclick="toggleCheck('+j+')"><span class="box">'+(c.d[j]?'✓':'')+'</span><div><b>'+x[0]+'</b><span>'+x[1]+'</span></div></li>';}).join('')+'</ul>';
+  h+='<ul class="ck">'+m.map(function(x,j){return '<li class="'+(c.d[j]?'on':'')+'" onclick="toggleCheck('+j+')"><span class="box">'+(c.d[j]?'✓':'')+'</span><div><b>'+x[0]+'</b><span>'+x[1]+'</span>'+(EXTIPS[x[0]]?'<span class="tip">💡 '+EXTIPS[x[0]]+'</span>':'')+'</div></li>';}).join('')+'</ul>';
   h+=done?'<button class="btn sec" disabled>✓ 今日は記録済み</button>':'<button class="btn" onclick="logPlan()">✅ 完了して記録'+(type==='R'?'（ウォーキング30分）':'')+'</button>';
   return h;}
 function renderTrain(){$('tFreq').value=db.plan.freq;$('tCardio').value=db.plan.cardio||'';$('tLevel').value=db.plan.level;
@@ -944,12 +945,13 @@ function renderBackup(){var el=$('bkBanner');if(!el)return;var lb=db.meta.lastBa
 /* ===== トレーニング記録（実施内容） ===== */
 var EXLIB=[
 ['胸・肩・三頭','str',['チェストプレス（マシン）','ペックフライ（マシン）','ショルダープレス（マシン）','サイドレイズ（ダンベル）','トライセプスプッシュダウン（ケーブル）','ベンチプレス','インクラインダンベルプレス','ケーブルクロスオーバー','ダンベルショルダープレス','スカルクラッシャー','ディップス','腕立て伏せ'],'A'],
-['背中・二頭','str',['ラットプルダウン（マシン）','シーテッドロー（マシン）','バックエクステンション','ダンベルカール','ハンマーカール','デッドリフト','懸垂（アシスト可）','ベントオーバーロウ','ワンハンドダンベルロウ','バーベルカール','インクラインダンベルカール'],'B'],
+['背中・二頭','str',['ラットプルダウン（マシン）','シーテッドロー（マシン）','ダイバージング・ロー・ロウ（PRECOR）','バックエクステンション','ダンベルカール','ハンマーカール','デッドリフト','懸垂（アシスト可）','ベントオーバーロウ','ワンハンドダンベルロウ','バーベルカール','インクラインダンベルカール'],'B'],
 ['脚・腹','str',['レッグプレス（マシン）','レッグエクステンション','レッグカール','アブドミナルクランチ（マシン）','プランク','バーベルスクワット','ルーマニアンデッドリフト','ブルガリアンスクワット','カーフレイズ','ハンギングレッグレイズ','アブローラー'],'C'],
 ['有酸素','cardio',['ステアマスター','ランニングマシン','バイク','クロストレーナー','ウォーキング'],''],
 ['キックボクシング','round',['縄跳び','シャドー','ミット打ち','サンドバッグ','スパーリング（マス可）','腹筋・首トレ'],'K']
 ];
 var curWid=null,progSel='';
+var EXTIPS={'ダイバージング・ロー・ロウ（PRECOR）':'胸を張り背すじを伸ばしたまま、肘を後ろへゆっくり引き肩甲骨を寄せる。'};
 function exInfo(n){for(var i=0;i<EXLIB.length;i++){if(EXLIB[i][2].indexOf(n)>=0)return {kind:EXLIB[i][1],split:EXLIB[i][3],group:EXLIB[i][0]};}
   var c=(db.customEx||[]).filter(function(x){return x.name===n;})[0];return {kind:c?c.kind:'str',split:'',group:'マイ種目'};}
 function gymName(g){return g==='any'?'エニタイム鴻巣':g==='kick'?'キックボクシング':'その他';}
@@ -1034,6 +1036,7 @@ function renderWorkout(force){var ed=$('wkEditor');if(!ed)return;var ae=document
   if(!w.items.length)h+='<div class="empty">種目を追加しましょう</div>';
   w.items.forEach(function(it,i){var info=exInfo(it.name),last=lastItem(it.name,w);
     h+='<div class="wi"><div class="wih"><b>'+esc(it.name)+'</b>'+(info.group?'<span class="tag">'+esc(info.group)+'</span>':'')+'<button class="del" data-a="rmItem" data-i="'+i+'" aria-label="種目を削除">×</button></div>';
+    if(EXTIPS[it.name])h+='<div class="tip">💡 '+esc(EXTIPS[it.name])+'</div>';
     if(last)h+='<div class="prev">前回 '+sd(last._d)+'：'+esc(itemText(last))+'</div>';
     if(it.kind==='str'){var b=exBest(it.name);if(b.w>0)h+='<div class="prev">🏆 ベスト '+b.w+'kg×'+b.r+'（'+sd(b.d)+'）・推定1RM '+Math.round(b.e*10)/10+'kg</div>';
       (it.sets||[]).forEach(function(s,j){h+='<div class="srow"><span class="sn">'+(j+1)+'</span><input type="number" step="0.5" inputmode="decimal" placeholder="kg" data-i="'+i+'" data-s="'+j+'" data-f="w" value="'+esc(s.w)+'"><span class="u">kg ×</span><input type="number" inputmode="numeric" placeholder="回" data-i="'+i+'" data-s="'+j+'" data-f="r" value="'+esc(s.r)+'"><span class="u">回</span><button class="sbtn" data-a="rmSet" data-i="'+i+'" data-s="'+j+'" aria-label="セット削除">−</button></div>';});

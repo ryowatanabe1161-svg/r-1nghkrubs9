@@ -60,7 +60,7 @@ nav button.on{color:#d27c97}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
 /* character */
 .chara{display:flex;align-items:flex-end;gap:8px}
-.chara svg{width:88px;flex:none}
+.chara svg{width:88px;flex:none;cursor:pointer}
 .bubble{position:relative;background:var(--pink2);border-radius:18px;padding:12px 14px;font-size:14.5px;font-weight:600;line-height:1.5;flex:1;margin-bottom:22px}
 .bubble:after{content:"";position:absolute;left:-8px;bottom:14px;border:8px solid transparent;border-right-color:var(--pink2);border-left:0}
 .bubble.pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
@@ -94,7 +94,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 <!-- HOME -->
 <section class="tab on" id="t-home">
   <div class="card">
-    <div class="chara" id="charaHome"></div>
+    <div class="chara"></div>
   </div>
   <div class="card">
     <h2>📅 今日のまとめ <span class="muted" id="todayLabel" style="margin-left:auto"></span></h2>
@@ -133,6 +133,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 
 <!-- WEIGHT -->
 <section class="tab" id="t-weight">
+  <div class="card"><div class="chara"></div></div>
   <div class="card">
     <h2>⚖️ 体重をきろく <span class="muted" style="margin-left:auto">朝と夜にはかろう♡</span></h2>
     <div class="row">
@@ -153,6 +154,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 
 <!-- MEAL -->
 <section class="tab" id="t-meal">
+  <div class="card"><div class="chara"></div></div>
   <div class="card">
     <h2>🍚 食事をきろく</h2>
     <div class="row" style="margin-bottom:8px">
@@ -177,7 +179,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 <!-- SNACK -->
 <section class="tab" id="t-snack">
   <div class="card">
-    <div class="chara" id="charaSnack"></div>
+    <div class="chara"></div>
   </div>
   <div class="card">
     <h2>🍫 間食をきろく <span class="count" id="snackCount">今日 0回</span></h2>
@@ -193,6 +195,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 
 <!-- EXERCISE -->
 <section class="tab" id="t-ex">
+  <div class="card"><div class="chara"></div></div>
   <div class="card">
     <h2>🏃‍♀️ 運動をきろく</h2>
     <div class="row" style="margin-bottom:8px">
@@ -261,40 +264,55 @@ function charaSVG(mood){
   </svg>`;
 }
 const LINES={
-  happy:['今日もえらいね〜♡ その調子！','おやつガマンできてるの、すてき✨','きれいなお姉さんへ一歩ずつ💕','水分もとってね、いっしょにがんばろ🎀','焦らなくて大丈夫。続けてるのがえらいの♡'],
-  choco:['もー！またチョコ食べたでしょー？💢','チョコの匂いがするよ…？🍫💢','めっ！チョコは1かけまでって言ったでしょ〜','チョコに負けちゃったの？もー！💢'],
-  sweets:['めっ！食べすぎちゃダメだよ〜','あまいものは心の栄養…でも食べすぎはダメ！💢','も〜！見てたんだからね？👀','おやつはほどほどに、だよ〜💢'],
+  happy:['今日もえらいね〜♡ その調子！','おやつガマンできてるの、すてき✨','きれいなお姉さんへ一歩ずつ💕','お水もこまめに飲もうね🎀','焦らなくて大丈夫。続けてるのがえらいの♡','今日のあなた、なんだか輝いてる✨','がんばりすぎない、でもサボらない。それが一番♡','姿勢よくするだけでもスッキリ見えるよ〜🌷','あなたのペースでいいんだよ♡'],
+  choco:['もー！またチョコ食べたでしょー？💢','チョコの匂いがするよ…？🍫💢','めっ！チョコは1かけまでって言ったでしょ〜','チョコに負けちゃったの？もー！💢','口のはしにチョコついてるよ…？👀💢','ちょっと！それ、チョコだよね!?🍫💢','チョコは逃げないから、明日にしよって言ったのに〜💢','カカオはからだにいい…って言い訳はききません！💢','また板チョコ開けたの〜？めっ！','チョコとわたし、どっちが大事なの〜!?💢','冷蔵庫のチョコ、こっそり減ってるの知ってるんだからね👀','チョコ禁止令、発令しまーす！🚨🍫','その一粒が…ふとももに…💢','甘い誘惑に負けちゃダメって約束したでしょ〜💢','ふーん、チョコ食べたんだ。ふーん。💢','もうっ！チョコばっかり見てないで、わたしを見て〜💢','チョコはごほうびの日だけ！今日はちがうよ〜🍫💢','高級チョコでもカロリーは一緒なんだからね〜💢','次チョコ食べたら、うさぎ泣いちゃうよ…🥺💢','めっ！チョコの箱、しまっておきなさ〜い📦💢','チョコ食べたぶん、あとで歩こうね？約束💢','とろける甘さに、とろけてる場合じゃないよ〜💢'],
+  sweets:['めっ！食べすぎちゃダメだよ〜','あまいものは心の栄養…でも食べすぎはダメ！💢','も〜！見てたんだからね？👀','おやつはほどほどに、だよ〜💢','それ、本当にお腹すいてた？💢','ちょっとだけ…がいちばん危ないの〜💢','口さみしいときはお茶にしよ？🍵💢','おやつの袋、ちゃんと閉じた〜？💢','食べたらおしまい！おかわりは無しね💢','今日はもうお口チャックだよ🤐💢','甘いもの見つけるの、上手すぎない…？💢','もぐもぐしてるの、聞こえてるよ〜👂💢','こら〜！おやつタイムは1日1回まで！','その一口、あとで後悔しない？💢','うさぎはにんじんでガマンしてるのに〜🥕💢'],
   one:['まぁ…1回ならゆるしてあげる♡ でもこれでおしまいね','今日の分はこれでおしまい！約束だよ🤙'],
-  wm:['朝の体重まだ測ってないよ〜！💢','おはよ♡ まずは体重計に乗ってね！💢','朝の体重、忘れてない〜？👀💢'],
-  wn:['夜の体重も測ってね！めっ！','夜の体重はかった〜？まだでしょ！💢','寝る前に体重計だよ〜！めっ！'],
-  many:['ちょっとー！今日{n}回目だよ!?💢💢','もう知らないっ！…うそ、明日からまたがんばろ？💢','{n}回はさすがに食べすぎ〜！お姉さん怒ってるよ💢💢','めっ！めっ！めーっ！！今日はもうおしまい！💢💢']
+  manyA:['ちょっとー！今日{n}回目だよ!?💢💢','{n}回目はさすがに見のがせないよ〜💢💢','上限こえちゃった！今日はもうおしまいっ💢💢','め〜っ！約束の回数、オーバーです💢💢','{n}回も…うさぎ、ほっぺふくらませてるよ💢💢','もう、お口チャック！今すぐ！💢💢'],
+  manyB:['めっ！めっ！めーっ！！今日{n}回目だよ!!💢💢💢','{n}回はさすがに食べすぎ〜！本気で怒ってるよ💢💢💢','もう知らないっ！…うそ、心配してるんだからね💢💢💢','おやつ警報発令中🚨 {n}回目！ストップ〜！💢💢💢','うさぎ、耳がピーンってなるくらい怒ってます💢💢💢','これ以上は…ぜったいダメっ！！{n}回目だよ💢💢💢','明日はおやつゼロでがんばろ？ね？ね!?💢💢💢'],
+  wm:['朝の体重まだ測ってないよ〜！💢','おはよ♡ まずは体重計に乗ってね！💢','朝の体重、忘れてない〜？👀💢','顔洗う前に、体重計だよ〜！💢','朝いちばんの体重がいちばん正確なの！測って〜💢','体重計さん、さみしそうにしてるよ…💢','朝ごはんの前に、ちゃちゃっと測ろ？💢','めっ！朝の体重がまだ空っぽだよ〜','測らないと、変化に気づけないよ〜💢','トイレのあと、体重計！これ朝のお約束💢','今朝の数字、見せてくれないの〜？💢'],
+  wn:['夜の体重も測ってね！めっ！','夜の体重はかった〜？まだでしょ！💢','寝る前に体重計だよ〜！めっ！','お風呂の前に、体重計乗ってね💢','夜の体重、まだ入ってないよ〜💢','1日のしめくくりは体重チェック！💢','測るだけでいいの、30秒だよ〜💢','夜の数字、見ないふりはダメだよ〜👀💢','パジャマに着替える前に測ろ？💢','朝と夜、両方そろうとグラフがかわいいの♡ 測って〜','めっ！夜の体重、忘れてるよ〜'],
+  wLog:['体重きろく、えらい〜っ♡','測れたね！その習慣がいちばん大事✨','ちゃんと測れるお姉さん、すてき💕','記録ありがと♡ グラフがうれしそう📈','毎日測るだけで、もう半分成功だよ♡','体重計に乗る勇気、えらいっ✨','ばっちり記録できたね🎀','数字と向き合えるの、かっこいいよ♡','今日もきろく完了♪ いい子いい子','この調子で、朝と夜そろえていこうね♡'],
+  wDown:['へってる！すごーいっ✨','やったね！{d}kg減ったよ〜🎉','がんばりが数字に出てきたね💕','わぁ、えらすぎる…！拍手👏','その調子！きれいが近づいてる🌷','減ってるよ〜！今日はとびきりの笑顔で♡','{d}kgダウン！自分をほめてあげてね✨','うさぎもぴょんぴょん喜んでるよ🐰','努力はうそつかないね♡','いい流れきてる〜！このまま行こ✨','すごいすごい！明日もいっしょにがんばろ💕'],
+  wUp:['大丈夫、むくみかもしれないよ♡','1日の数字に一喜一憂しなくていいの🌷','ちょっと増えたくらい、すぐ戻せるよ♡','水分や塩分でも変わるからね、気にしないで〜','今日はゆっくりお風呂であったまろ？♨️','増えた日も測れたあなたがえらいの✨','長い目で見ればちゃんと下がってるよ📉','明日また整えればいいだけ♡','落ちこまないで〜、わたしがついてるよ🐰','がんばってるの、ちゃんと知ってるよ💕','グラフはなだらかに見ようね♡'],
+  meal:['ちゃんと記録できたね♡','バランスよく食べてて、えらい〜🍚','食べたものを書けるの、えらいよ✨','まだ目標の範囲内！いいかんじ♡','しっかり食べて、きれいになろ🌷','たんぱく質も意識できてる？いいね💪','ゆっくりよく噛んで食べてね♡','この調子なら今日はばっちり🎀','記録するだけで食べすぎ防止になるの♡','おいしく食べて、ちゃんとやせよ〜✨','今日のごはん、えらいチョイス💕'],
+  over:['あれれ、目標カロリーこえちゃったよ〜💢','ちょっと食べすぎかも…明日調整しよ？','カロリーオーバー！お散歩いこっか🚶‍♀️','め〜っ！今日はもうごちそうさまだよ💢','目標より多めだよ〜、夜は軽めにね','オーバーしちゃった…でも明日取り戻せるよ💢','今日はもうお腹いっぱいでしょ？💢','ストップストップ〜！カロリーさんあふれてる💢','おかわりは禁止っ！めっ！','少し動けばまだ間に合うよ〜🏃‍♀️💢','食べすぎた日は、早く寝るのがいちばん🌙'],
+  ex:['運動えらい〜っ！✨','{k}kcalも燃やしたの!? すごい🔥','汗をかくあなた、かっこいい💕','からだが喜んでるよ〜♡','がんばったね！ストレッチも忘れずに🧘‍♀️','動いた自分に、はなまる💮','その調子で、引き締まっていこ✨','今日のMVPはあなたです🏆','運動したあとのお水、ちゃんと飲んでね💧','{k}kcal分、きれいに近づいたよ♡','筋肉さんがありがとうって言ってるよ💪','続けてるのがほんとにえらい！','動けるって素敵なこと♡ お疲れさま','ふぅ〜おつかれさま！ゆっくり休んでね🌙','うさぎもいっしょにぴょんぴょんしたよ🐰','汗はがんばった証拠✨ えらすぎ！'],
+  gMorning:['おはよう♡ 今日もいっしょにがんばろ☀️','朝の光、気持ちいいね〜🌞','おはよ！まずはお水を一杯どうぞ💧','今日もいい1日になりますように🌷','朝ごはんはしっかり食べようね🍚','おはよう、今日もきれいだね✨'],
+  gNoon:['こんにちは♡ お昼はなに食べる？','午後もがんばろうね〜🌼','ちょっと休憩して、のびーってしよ','お昼のあとはお散歩もいいかも🚶‍♀️','おやつの時間…まだダメだよ〜？👀','こんにちは！お水飲んでる〜？💧'],
+  gEvening:['おつかれさま♡ 今日もよくがんばったね','こんばんは！夜ごはんは軽めにね🌙','今日もえらかったね、ぎゅー🐰','ゆっくりお風呂入ってね♨️','夜のおやつはがまんだよ〜？','こんばんは♡ 今日の体重も測ってね'],
+  gNight:['こんな時間に…夜食はダメだよ〜？🌙','そろそろ寝よっか、おやすみ♡','夜ふかしは太るもとなんだって〜','明日の朝の体重、楽しみにしてるね💤','早く寝ると、きれいになれるよ✨','おやすみなさい♡ いい夢見てね🌙'],
+  tap:['なぁに？♡','つんつんしないで〜くすぐったい🐰','呼んだ〜？','わたしはずっと見守ってるよ👀♡','今日もかわいいね💕','耳はさわっちゃダメ〜！','にんじん食べたいなぁ🥕','お水飲んだ？💧','ぴょんっ♪','いっしょにがんばろうね🎀','あなたならできるよ✨','ふふっ、ひまなの〜？','チョコ隠してない…？👀','背筋のばしてみて〜、ほら素敵！','うさぎもダイエット中なの🐰','深呼吸〜すぅ〜はぁ〜🌿','がんばってるの知ってるよ♡','今日のごはん、なにかな〜？','えへへ、なでなでしてくれるの？','もぐもぐ…あ、これはにんじんだよ🥕','あなたの味方だよ♡','ねむねむ…はっ！起きてるよ！'],
 };
-const pick=a=>a[Math.floor(Math.random()*a.length)];
+const _last={};
+function pick(k){const a=Array.isArray(k)?k:LINES[k];const key=Array.isArray(k)?'_':k;if(a.length<2)return a[0];let i;do{i=Math.floor(Math.random()*a.length)}while(i===_last[key]);_last[key]=i;return a[i]}
 const isChoco=n=>/チョコ|ちょこ|choco|ショコラ|ガトー|ブラウニー|ココア/i.test(n);
 function todaySnacks(){return D.snacks.filter(s=>s.date===today())}
-function renderChara(id,line,mood,animate){
-  const el=$(id);
-  el.innerHTML=charaSVG(mood)+`<div class="bubble ${mood!=='happy'?'angry':''}">${esc(line)}</div>`;
-  if(animate){const b=el.querySelector('.bubble');b.classList.add('pop');const s=el.querySelector('svg');s.classList.add('shake')}
-}
+let cur={line:'',mood:'happy'};
+function say(line,mood,animate){cur={line,mood};
+  document.querySelectorAll('.chara').forEach(el=>{
+    el.innerHTML=charaSVG(mood)+`<div class="bubble ${mood!=='happy'?'angry':''}">${esc(line)}</div>`;
+    if(animate){el.querySelector('.bubble').classList.add('pop');if(mood!=='happy')el.querySelector('svg').classList.add('shake')}
+  })}
+document.addEventListener('click',e=>{if(e.target.closest('.chara svg'))say(pick('tap'),'happy',true)});
 function weightMissing(){const h=new Date().getHours(),t=today();
   if(h>=18&&wOf(t,'n')==null)return 'wn';
   if(h>=5&&wOf(t,'m')==null)return 'wm';
   return null}
+function greetKey(){const h=new Date().getHours();return h>=5&&h<10?'gMorning':h>=10&&h<17?'gNoon':h>=17&&h<22?'gEvening':'gNight'}
+function snackLine(name){const n=todaySnacks().length,max=D.set.snackMax||1;
+  if(n>max+1)return{line:pick('manyB').replace(/\{n\}/g,n),mood:'veryMad'};
+  if(n>max)return{line:pick('manyA').replace(/\{n\}/g,n),mood:'veryMad'};
+  if(isChoco(name))return{line:pick('choco'),mood:'mad'};
+  return{line:pick('sweets'),mood:'mad'}}
 function scoldLine(lastName){
+  if(lastName)return snackLine(lastName);
   const n=todaySnacks().length,max=D.set.snackMax||1;
-  if(!lastName){const wmiss=weightMissing();if(wmiss)return{line:pick(LINES[wmiss]),mood:'mad'}}
-  if(n===0)return{line:pick(LINES.happy),mood:'happy'};
-  if(n>max)return{line:pick(LINES.many).replace('{n}',n),mood:'veryMad'};
-  if(lastName&&isChoco(lastName))return{line:pick(LINES.choco),mood:'mad'};
-  if(n===1&&!lastName)return{line:pick(LINES.one),mood:'mad'};
-  return{line:pick(LINES.sweets),mood:'mad'};
-}
-function renderCharas(animate,lastName){
-  const s=scoldLine(lastName);
-  renderChara('charaSnack',s.line,s.mood,animate);
-  renderChara('charaHome',s.line,s.mood,animate);
-}
+  const wmiss=weightMissing();if(wmiss)return{line:pick(wmiss),mood:'mad'};
+  if(n>max)return{line:pick(n>max+1?'manyB':'manyA').replace(/\{n\}/g,n),mood:'veryMad'};
+  if(n===1)return{line:pick('one'),mood:'mad'};
+  return{line:pick(Math.random()<.6?greetKey():'happy'),mood:'happy'}}
+function renderCharas(animate,lastName){const s=scoldLine(lastName);say(s.line,s.mood,animate)}
 
 /* ---------- tabs ---------- */
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
@@ -314,8 +332,10 @@ function addWeight(){
   if(!(v>20&&v<300)){toast('体重を入れてね');return}
   D.weights[d]=D.weights[d]||{};D.weights[d][slot]=Math.round(v*10)/10;save();$('wVal').value='';
   const prev=Object.keys(D.weights).sort().filter(k=>k<d&&wOf(k,slot)!=null).pop();
-  if(prev&&wOf(prev,slot)>v)toast('へってる！すごーい✨');else toast((slot==='m'?'朝':'夜')+'の体重きろくしたよ♡');
-  renderCharas(false);render();
+  const pv=prev?wOf(prev,slot):null;toast((slot==='m'?'朝':'夜')+'の体重きろくしたよ♡');render();
+  if(pv!=null&&v<pv)say(pick('wDown').replace('{d}',(pv-v).toFixed(1)),'happy',true);
+  else if(pv!=null&&v>pv)say(pick('wUp'),'happy',true);
+  else say(pick('wLog'),'happy',true);
 }
 function delWeight(d,slot){if(confirm(md(d)+(slot==='m'?' 朝':' 夜')+' の体重を消す？')){delete D.weights[d][slot];if(!Object.keys(D.weights[d]).length)delete D.weights[d];save();renderCharas(false);render()}}
 function lineChart(series,goal){
@@ -365,7 +385,9 @@ function quick(id,list,fn){$(id).innerHTML=list.map((q,i)=>`<button class="chip"
   $(id).querySelectorAll('.chip').forEach(b=>b.onclick=()=>fn(list[b.dataset.i]))}
 quick('mQuick',MEAL_Q,q=>{pushMeal(q[0],q[1])});
 quick('sQuick',SNACK_Q,q=>{pushSnack(q[0],q[1])});
-function pushMeal(name,kcal){D.meals.push({id:uid(),date:$('mDate').value||today(),type:$('mType').value,name,kcal:+kcal});save();toast(`${name} ${kcal}kcal きろく♡`);render()}
+function pushMeal(name,kcal){D.meals.push({id:uid(),date:$('mDate').value||today(),type:$('mType').value,name,kcal:+kcal});save();toast(`${name} ${kcal}kcal きろく♡`);render();
+  const d=$('mDate').value||today(),tot=dayIn(d)+daySnack(d),lim=(D.set.kcal||1600)+dayOut(d);
+  if(tot>lim)say(pick('over'),'mad',true);else say(pick('meal'),'happy',true)}
 function addMeal(){const n=$('mName').value.trim(),k=parseInt($('mKcal').value);
   if(!n||!(k>=0)){toast('なまえとkcalを入れてね');return}
   if(isChoco(n)||/ケーキ|クッキー|アイス|お菓子|おかし|スイーツ|ドーナツ|プリン|ポテチ/.test(n)){if(confirm('それって間食じゃない…？👀\n間食として記録する？')){pushSnack(n,k);$('mName').value='';$('mKcal').value='';return}}
@@ -433,7 +455,7 @@ $('eType').onchange=calcEx;$('eMin').oninput=calcEx;
 function addEx(){const e=EX[$('eType').value],m=parseInt($('eMin').value)||0,k=parseInt($('eKcal').value);
   if(!(k>0)){toast('時間かkcalを入れてね');return}
   D.ex.push({id:uid(),date:$('eDate').value||today(),name:e[0],min:m,kcal:k});save();
-  $('eMin').value='';$('eKcal').value='';toast(`${k}kcal 燃やしたね！えらい✨`);render()}
+  $('eMin').value='';$('eKcal').value='';toast(`${k}kcal 燃やしたね！えらい✨`);render();say(pick('ex').replace(/\{k\}/g,k),'happy',true)}
 function renderEx(){
   const d=$('eDate').value||today();const it=D.ex.filter(x=>x.date===d);
   $('eList').innerHTML=(it.map(x=>`<li><span>${esc(x.name)} ${x.min?`<span class="muted">${x.min}分</span>`:''}</span><span>${x.kcal} kcal <button class="del" onclick="delItem('ex','${x.id}')">✕</button></span></li>`).join('')||'<li class="muted">まだないよ</li>')

@@ -60,8 +60,8 @@ nav button.on{color:#d27c97}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
 /* character */
 .chara{display:flex;align-items:flex-end;gap:8px}
-.chara svg{width:96px;flex:none}
-.bubble{position:relative;background:var(--pink2);border-radius:18px;padding:12px 14px;font-size:14.5px;font-weight:600;line-height:1.5;flex:1;margin-bottom:28px}
+.chara svg{width:88px;flex:none}
+.bubble{position:relative;background:var(--pink2);border-radius:18px;padding:12px 14px;font-size:14.5px;font-weight:600;line-height:1.5;flex:1;margin-bottom:22px}
 .bubble:after{content:"";position:absolute;left:-8px;bottom:14px;border:8px solid transparent;border-right-color:var(--pink2);border-left:0}
 .bubble.pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
 .bubble.angry{background:#f9c9d3;color:#8a3550}
@@ -109,10 +109,11 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
   <div class="card">
     <h2>⚖️ 体重</h2>
     <div class="stats">
-      <div class="stat"><b id="hW">—</b><span>今日</span></div>
-      <div class="stat"><b id="hDiff">—</b><span>前回から</span></div>
+      <div class="stat"><b id="hWm">—</b><span>☀️ 今朝</span></div>
+      <div class="stat"><b id="hWn">—</b><span>🌙 今夜</span></div>
       <div class="stat"><b id="hGoal">—</b><span>目標まで</span></div>
     </div>
+    <div class="muted" id="hDiff" style="margin-top:8px;text-align:center"></div>
   </div>
   <div class="card">
     <h2>⚙️ せってい</h2>
@@ -133,10 +134,11 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
 <!-- WEIGHT -->
 <section class="tab" id="t-weight">
   <div class="card">
-    <h2>⚖️ 体重をきろく</h2>
+    <h2>⚖️ 体重をきろく <span class="muted" style="margin-left:auto">朝と夜にはかろう♡</span></h2>
     <div class="row">
-      <input id="wDate" type="date" style="flex:1.1">
-      <input id="wVal" type="number" inputmode="decimal" step="0.1" placeholder="kg" style="flex:1">
+      <select id="wSlot" style="flex:none;width:86px;padding:10px 6px"><option value="m">☀️ 朝</option><option value="n">🌙 夜</option></select>
+      <input id="wDate" type="date" style="flex:1.6">
+      <input id="wVal" type="number" inputmode="decimal" step="0.1" placeholder="kg" style="flex:.8">
       <button onclick="addWeight()">きろく</button>
     </div>
   </div>
@@ -144,7 +146,7 @@ details summary{cursor:pointer;color:var(--sub);font-size:13px}
     <h2>📈 体重のグラフ</h2>
     <div class="row" style="margin-bottom:6px"><button class="ghost small rng" data-r="14">2週間</button><button class="ghost small rng" data-r="30">1か月</button><button class="ghost small rng" data-r="90">3か月</button></div>
     <div id="wChart"></div>
-    <div class="legend"><span><i style="background:#e8a0b4"></i>体重</span><span><i style="background:#c7b6e6"></i>目標</span></div>
+    <div class="legend"><span><i style="background:#e8a0b4"></i>朝</span><span><i style="background:#9d8bd0"></i>夜</span><span><i style="background:#c7b6e6"></i>目標</span></div>
   </div>
   <div class="card"><h2>🗒 りれき</h2><ul class="list" id="wList"></ul></div>
 </section>
@@ -223,6 +225,8 @@ const KEY='kawaiiDiet.v1';
 const today=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
 const def={weights:{},meals:[],snacks:[],ex:[],set:{kcal:1600,goal:null,snackMax:1}};
 let D;try{D=Object.assign(structuredClone(def),JSON.parse(localStorage.getItem(KEY)||'{}'));D.set=Object.assign({},def.set,D.set)}catch(e){D=structuredClone(def)}
+function migrate(x){x.weights=x.weights||{};for(const k in x.weights){const v=x.weights[k];if(typeof v==='number')x.weights[k]={m:v};}return x}
+migrate(D);
 const save=()=>localStorage.setItem(KEY,JSON.stringify(D));
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -233,37 +237,25 @@ const md=s=>{const[,m,d]=s.split('-');return (+m)+'/'+(+d)};
 
 /* ---------- character ---------- */
 function charaSVG(mood){
-  // mood: happy | mad | veryMad
-  const mouth=mood==='happy'?'<path d="M44 66 Q50 72 56 66" stroke="#8a4a5e" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
-    :mood==='mad'?'<path d="M45 69 Q50 65 55 69" stroke="#8a4a5e" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
-    :'<ellipse cx="50" cy="68" rx="4" ry="3.2" fill="#8a4a5e"/>';
-  const brows=mood==='happy'?'':'<path d="M36 47 L45 50" stroke="#6d4a3c" stroke-width="2.2" stroke-linecap="round"/><path d="M64 47 L55 50" stroke="#6d4a3c" stroke-width="2.2" stroke-linecap="round"/>';
-  const cls=mood==='happy'?'bounce':'mad';
-  return `<svg viewBox="0 0 100 130" class="${cls}" aria-label="うさぎのお姉さん">
-  <!-- ears -->
-  <ellipse cx="34" cy="16" rx="8" ry="20" fill="#fff" stroke="#f0c9d4" stroke-width="2"/><ellipse cx="34" cy="17" rx="4" ry="14" fill="#f8cfd9"/>
-  <ellipse cx="66" cy="16" rx="8" ry="20" fill="#fff" stroke="#f0c9d4" stroke-width="2" transform="rotate(${mood==='happy'?8:-4} 66 30)"/><ellipse cx="66" cy="17" rx="4" ry="14" fill="#f8cfd9" transform="rotate(${mood==='happy'?8:-4} 66 30)"/>
-  <!-- hair back -->
-  <path d="M20 58 Q18 92 30 100 L70 100 Q82 92 80 58 Z" fill="#9b6b55"/>
-  <!-- body -->
-  <path d="M28 128 Q30 98 50 96 Q70 98 72 128 Z" fill="#e8a0b4"/>
-  <path d="M42 98 L50 108 L58 98" fill="#fff"/>
-  <!-- face -->
-  <circle cx="50" cy="58" r="24" fill="#ffe9e0"/>
-  <!-- bangs -->
-  <path d="M26 56 Q28 32 50 32 Q72 32 74 56 Q66 44 56 46 Q52 40 46 46 Q34 44 26 56 Z" fill="#a8765f"/>
-  <!-- ribbon -->
-  <g transform="translate(66 36)"><path d="M0 0 L-9 -6 L-9 6 Z M0 0 L9 -6 L9 6 Z" fill="#d98aa3"/><circle r="3" fill="#c46f8a"/></g>
-  ${brows}
-  <!-- eyes -->
-  ${mood==='happy'?'<path d="M38 57 Q42 53 46 57" stroke="#5a3a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M54 57 Q58 53 62 57" stroke="#5a3a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
-   :'<ellipse cx="42" cy="57" rx="3.2" ry="4" fill="#5a3a3a"/><ellipse cx="58" cy="57" rx="3.2" ry="4" fill="#5a3a3a"/><circle cx="43" cy="55.5" r="1.1" fill="#fff"/><circle cx="59" cy="55.5" r="1.1" fill="#fff"/>'}
-  <ellipse class="cheek" cx="36" cy="64" rx="4.5" ry="2.8" fill="#f8bccb" opacity=".8"/><ellipse class="cheek" cx="64" cy="64" rx="4.5" ry="2.8" fill="#f8bccb" opacity=".8"/>
+  // simple flat bunny blob. mood: happy | mad | veryMad
+  const happy=mood==='happy';
+  const eyes=happy
+    ?'<path d="M37 62 q4 -4 8 0 M55 62 q4 -4 8 0" stroke="#5a4450" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+    :'<circle cx="41" cy="62" r="3" fill="#5a4450"/><circle cx="59" cy="62" r="3" fill="#5a4450"/><path d="M35 53 l9 4 M65 53 l-9 4" stroke="#5a4450" stroke-width="2.4" stroke-linecap="round"/>';
+  const mouth=happy?'<path d="M46 71 q4 4 8 0" stroke="#5a4450" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+    :mood==='mad'?'<path d="M46 73 q4 -3 8 0" stroke="#5a4450" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+    :'<ellipse cx="50" cy="73" rx="3.2" ry="2.6" fill="#5a4450"/>';
+  const ear=happy?0:-8;
+  return `<svg viewBox="0 0 100 100" class="${happy?'bounce':'mad'}" aria-label="うさぎ">
+  <g fill="#fff" stroke="#f3c6d3" stroke-width="2">
+    <rect x="28" y="6" width="15" height="38" rx="7.5" transform="rotate(${-8-ear} 35 40)"/>
+    <rect x="57" y="6" width="15" height="38" rx="7.5" transform="rotate(${8+ear} 65 40)"/>
+  </g>
+  <ellipse cx="50" cy="66" rx="34" ry="28" fill="#fff" stroke="#f3c6d3" stroke-width="2"/>
+  ${eyes}
+  <ellipse class="cheek" cx="32" cy="70" rx="5" ry="3" fill="#f8c3d0"/><ellipse class="cheek" cx="68" cy="70" rx="5" ry="3" fill="#f8c3d0"/>
   ${mouth}
-  <!-- arm / finger -->
-  ${mood==='happy'?'':'<path d="M70 110 Q82 100 84 86" stroke="#ffe9e0" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="84" cy="84" r="3.5" fill="#ffe9e0"/>'}
-  <!-- anger mark -->
-  <g id="angerMark" transform="translate(78 30)" stroke="#e05a7a" stroke-width="2.4" fill="none" stroke-linecap="round">
+  <g id="angerMark" transform="translate(80 40)" stroke="#e07a8f" stroke-width="2.4" fill="none" stroke-linecap="round">
     <path d="M-6 -2 Q-2 -2 -2 -6"/><path d="M6 -2 Q2 -2 2 -6"/><path d="M-6 2 Q-2 2 -2 6"/><path d="M6 2 Q2 2 2 6"/>
   </g>
   </svg>`;
@@ -273,6 +265,8 @@ const LINES={
   choco:['もー！またチョコ食べたでしょー？💢','チョコの匂いがするよ…？🍫💢','めっ！チョコは1かけまでって言ったでしょ〜','チョコに負けちゃったの？もー！💢'],
   sweets:['めっ！食べすぎちゃダメだよ〜','あまいものは心の栄養…でも食べすぎはダメ！💢','も〜！見てたんだからね？👀','おやつはほどほどに、だよ〜💢'],
   one:['まぁ…1回ならゆるしてあげる♡ でもこれでおしまいね','今日の分はこれでおしまい！約束だよ🤙'],
+  wm:['朝の体重まだ測ってないよ〜！💢','おはよ♡ まずは体重計に乗ってね！💢','朝の体重、忘れてない〜？👀💢'],
+  wn:['夜の体重も測ってね！めっ！','夜の体重はかった〜？まだでしょ！💢','寝る前に体重計だよ〜！めっ！'],
   many:['ちょっとー！今日{n}回目だよ!?💢💢','もう知らないっ！…うそ、明日からまたがんばろ？💢','{n}回はさすがに食べすぎ〜！お姉さん怒ってるよ💢💢','めっ！めっ！めーっ！！今日はもうおしまい！💢💢']
 };
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -283,8 +277,13 @@ function renderChara(id,line,mood,animate){
   el.innerHTML=charaSVG(mood)+`<div class="bubble ${mood!=='happy'?'angry':''}">${esc(line)}</div>`;
   if(animate){const b=el.querySelector('.bubble');b.classList.add('pop');const s=el.querySelector('svg');s.classList.add('shake')}
 }
+function weightMissing(){const h=new Date().getHours(),t=today();
+  if(h>=18&&wOf(t,'n')==null)return 'wn';
+  if(h>=5&&wOf(t,'m')==null)return 'wm';
+  return null}
 function scoldLine(lastName){
   const n=todaySnacks().length,max=D.set.snackMax||1;
+  if(!lastName){const wmiss=weightMissing();if(wmiss)return{line:pick(LINES[wmiss]),mood:'mad'}}
   if(n===0)return{line:pick(LINES.happy),mood:'happy'};
   if(n>max)return{line:pick(LINES.many).replace('{n}',n),mood:'veryMad'};
   if(lastName&&isChoco(lastName))return{line:pick(LINES.choco),mood:'mad'};
@@ -301,48 +300,62 @@ function renderCharas(animate,lastName){
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+b.dataset.t));
-  window.scrollTo(0,0);render();
+  window.scrollTo(0,0);if(b.dataset.t==='home')renderCharas(true);render();
 });
 
 /* ---------- weight ---------- */
 let wRange=30;
 document.querySelectorAll('.rng').forEach(b=>b.onclick=()=>{wRange=+b.dataset.r;renderWeight()});
+function wOf(d,slot){const w=D.weights[d];return w&&w[slot]!=null?w[slot]:null}
+function allW(){const a=[];Object.keys(D.weights).sort().forEach(d=>{['m','n'].forEach(k=>{const v=wOf(d,k);if(v!=null)a.push({d,k,v})})});return a}
+function morningSeries(){return Object.keys(D.weights).sort().filter(d=>wOf(d,'m')!=null).map(d=>({d,v:wOf(d,'m')}))}
 function addWeight(){
-  const v=parseFloat($('wVal').value),d=$('wDate').value||today();
+  const v=parseFloat($('wVal').value),d=$('wDate').value||today(),slot=$('wSlot').value;
   if(!(v>20&&v<300)){toast('体重を入れてね');return}
-  D.weights[d]=Math.round(v*10)/10;save();$('wVal').value='';
-  const prev=Object.keys(D.weights).sort().filter(k=>k<d).pop();
-  if(prev&&D.weights[prev]>v)toast('へってる！すごーい✨');else toast('きろくしたよ♡');
-  render();
+  D.weights[d]=D.weights[d]||{};D.weights[d][slot]=Math.round(v*10)/10;save();$('wVal').value='';
+  const prev=Object.keys(D.weights).sort().filter(k=>k<d&&wOf(k,slot)!=null).pop();
+  if(prev&&wOf(prev,slot)>v)toast('へってる！すごーい✨');else toast((slot==='m'?'朝':'夜')+'の体重きろくしたよ♡');
+  renderCharas(false);render();
 }
-function delWeight(d){if(confirm(md(d)+' の体重を消す？')){delete D.weights[d];save();render()}}
-function lineChart(points,goal){
-  const W=340,H=180,P={l:34,r:10,t:12,b:24};
-  if(points.length===0)return '<p class="muted" style="text-align:center;padding:30px 0">まだ記録がないよ。今日の体重を入れてみよう♡</p>';
-  let vals=points.map(p=>p.v);if(goal)vals.push(goal);
+function delWeight(d,slot){if(confirm(md(d)+(slot==='m'?' 朝':' 夜')+' の体重を消す？')){delete D.weights[d][slot];if(!Object.keys(D.weights[d]).length)delete D.weights[d];save();renderCharas(false);render()}}
+function lineChart(series,goal){
+  const W=340,H=190,P={l:34,r:12,t:14,b:24};
+  const all=series.flatMap(x=>x.pts);
+  if(all.length===0)return '<p class="muted" style="text-align:center;padding:30px 0">まだ記録がないよ。今日の体重を入れてみよう♡</p>';
+  let vals=all.map(p=>p.v);if(goal)vals.push(goal);
   let mn=Math.min(...vals)-0.5,mx=Math.max(...vals)+0.5;
-  const t0=new Date(points[0].d).getTime(),t1=new Date(points[points.length-1].d).getTime()||t0+1;
+  const ds=all.map(p=>p.d).sort();
+  const t0=new Date(ds[0]).getTime(),t1=new Date(ds[ds.length-1]).getTime();
   const X=d=>P.l+(t1===t0?0.5:(new Date(d).getTime()-t0)/(t1-t0))*(W-P.l-P.r);
   const Y=v=>P.t+(1-(v-mn)/(mx-mn))*(H-P.t-P.b);
   let g='';
   for(let i=0;i<=4;i++){const v=mn+(mx-mn)*i/4,y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${P.l-4}" y="${y+3}" font-size="9" text-anchor="end" fill="var(--sub)">${v.toFixed(1)}</text>`}
   if(goal)g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(goal)}" y2="${Y(goal)}" stroke="#c7b6e6" stroke-width="2" stroke-dasharray="5 4"/><text x="${W-P.r}" y="${Y(goal)-4}" font-size="9" text-anchor="end" fill="#a58fd0">目標 ${goal}</text>`;
-  const path=points.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+Y(p.v).toFixed(1)).join(' ');
-  const area=path+` L${X(points[points.length-1].d)} ${H-P.b} L${X(points[0].d)} ${H-P.b} Z`;
-  const step=Math.ceil(points.length/6);
-  const labels=points.map((p,i)=>(i%step===0||i===points.length-1)?`<text x="${X(p.d)}" y="${H-8}" font-size="9" text-anchor="middle" fill="var(--sub)">${md(p.d)}</text>`:'').join('');
-  const dots=points.map(p=>`<circle cx="${X(p.d)}" cy="${Y(p.v)}" r="3.5" fill="#fff" stroke="#e8a0b4" stroke-width="2"/>`).join('');
-  const last=points[points.length-1];
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}"><defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3b6c6" stop-opacity=".45"/><stop offset="1" stop-color="#f3b6c6" stop-opacity="0"/></linearGradient></defs>${g}<path d="${area}" fill="url(#wg)"/><path d="${path}" fill="none" stroke="#e8a0b4" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>${dots}${labels}<text x="${X(last.d)}" y="${Y(last.v)-8}" font-size="10" font-weight="700" text-anchor="${points.length>1?'end':'middle'}" fill="#d27c97">${last.v}♡</text></svg>`;
+  const ud=[...new Set(ds)];const step=Math.ceil(ud.length/6);
+  const labels=ud.map((d,i)=>(i%step===0||i===ud.length-1)?`<text x="${X(d)}" y="${H-8}" font-size="9" text-anchor="middle" fill="var(--sub)">${md(d)}</text>`:'').join('');
+  let lines='';
+  const ls=series.filter(x=>x.pts.length).map(x=>x.pts[x.pts.length-1].v);
+  series.forEach(sr=>{if(sr.pts.length&&ls.length===2)sr.below=sr.pts[sr.pts.length-1].v===Math.min(...ls)&&sr.pts[sr.pts.length-1].v!==Math.max(...ls)||(sr.dash&&ls[0]===ls[1]);else sr.below=false});
+  series.forEach(sr=>{const pts=sr.pts;if(!pts.length)return;
+    const path=pts.map((p,i)=>(i?'L':'M')+X(p.d).toFixed(1)+' '+Y(p.v).toFixed(1)).join(' ');
+    lines+=`<path d="${path}" fill="none" stroke="${sr.color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" ${sr.dash?'stroke-dasharray="6 4"':''}/>`
+      +pts.map(p=>`<circle cx="${X(p.d)}" cy="${Y(p.v)}" r="3.4" fill="#fff" stroke="${sr.color}" stroke-width="2"/>`).join('');
+    const last=pts[pts.length-1];
+    lines+=`<text x="${X(last.d)}" y="${Y(last.v)+(sr.below?14:-8)}" font-size="10" font-weight="700" text-anchor="${ud.length>1?'end':'middle'}" fill="${sr.color}">${sr.icon}${last.v.toFixed(1)}</text>`;
+  });
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}">${g}${lines}${labels}</svg>`;
 }
 function renderWeight(){
   document.querySelectorAll('.rng').forEach(b=>b.style.opacity=(+b.dataset.r===wRange)?1:.55);
   const from=addDays(today(),-wRange+1);
-  const pts=Object.keys(D.weights).sort().filter(d=>d>=from).map(d=>({d,v:D.weights[d]}));
-  $('wChart').innerHTML=lineChart(pts,D.set.goal);
-  const keys=Object.keys(D.weights).sort().reverse();
-  $('wList').innerHTML=keys.slice(0,30).map((d,i)=>{const p=keys[i+1];const df=p?(D.weights[d]-D.weights[p]):null;
-    return `<li><span>${md(d)}　<b>${D.weights[d]} kg</b> ${df===null?'':`<span class="muted">${df>0?'+':''}${df.toFixed(1)}</span>`}</span><button class="del" onclick="delWeight('${d}')">✕</button></li>`}).join('')||'<li class="muted">まだないよ</li>';
+  const days=Object.keys(D.weights).sort().filter(d=>d>=from);
+  const sm={pts:days.filter(d=>wOf(d,'m')!=null).map(d=>({d,v:wOf(d,'m')})),color:'#e8a0b4',icon:'☀️'};
+  const sn={pts:days.filter(d=>wOf(d,'n')!=null).map(d=>({d,v:wOf(d,'n')})),color:'#9d8bd0',icon:'🌙',dash:true,below:true};
+  $('wChart').innerHTML=lineChart([sm,sn],D.set.goal);
+  const keys=Object.keys(D.weights).sort().reverse().slice(0,30);
+  const cell=(d,k)=>{const v=wOf(d,k);return v==null?`<span class="muted">${k==='m'?'☀️':'🌙'} —</span>`:`<span>${k==='m'?'☀️':'🌙'} <b>${v}</b> <button class="del" onclick="delWeight('${d}','${k}')">✕</button></span>`};
+  $('wList').innerHTML=keys.map(d=>{const m=wOf(d,'m'),n=wOf(d,'n');const df=(m!=null&&n!=null)?` <span class="muted">(${n-m>0?'+':''}${(n-m).toFixed(1)})</span>`:'';
+    return `<li><span>${md(d)}${df}</span><span style="display:flex;gap:10px">${cell(d,'m')}${cell(d,'n')}</span></li>`}).join('')||'<li class="muted">まだないよ</li>';
 }
 
 /* ---------- meals ---------- */
@@ -412,7 +425,7 @@ function renderSnacks(){
 /* ---------- exercise ---------- */
 const EX=[['キックボクシング',10],['ウォーキング',3.5],['早歩き',4.3],['ヨガ',2.5],['ピラティス',3],['筋トレ',5],['ステアクライマー',9],['ランニング',8],['エアロバイク',6.8],['ストレッチ',2.3],['ダンス',5],['水泳',7]];
 $('eType').innerHTML=EX.map((e,i)=>`<option value="${i}">${e[0]}</option>`).join('');
-function bodyW(){const k=Object.keys(D.weights).sort();return k.length?D.weights[k[k.length-1]]:55}
+function bodyW(){const a=allW();return a.length?a[a.length-1].v:55}
 function calcEx(){const m=parseInt($('eMin').value);const e=EX[$('eType').value];
   if(m>0){$('eKcal').value=Math.round(e[1]*bodyW()*m/60)}
   $('eHint').textContent=`${e[0]}：METs ${e[1]} × 体重 ${bodyW()}kg × 時間 で計算（手入力もOK）`}
@@ -437,10 +450,11 @@ function renderHome(){
   const pct=Math.min(100,inK/(goal+out)*100);
   $('kbarI').style.width=pct+'%';$('kbar').classList.toggle('over',left<0);
   $('kbarText').textContent=left<0?`目標より ${-left}kcal オーバー…明日また整えよ♡`:`目標 ${goal}kcal ＋ 運動 ${out}kcal まで あと ${left}kcal`;
-  const k=Object.keys(D.weights).sort();
-  if(k.length){const w=D.weights[k[k.length-1]];$('hW').textContent=w;
-    if(k.length>1){const df=w-D.weights[k[k.length-2]];$('hDiff').textContent=(df>0?'+':'')+df.toFixed(1);$('hDiff').style.color=df<=0?'#7bbfa8':'var(--danger)'}
-    $('hGoal').textContent=D.set.goal?Math.max(0,w-D.set.goal).toFixed(1):'—'}
+  const wm=wOf(t,'m'),wn=wOf(t,'n');
+  $('hWm').textContent=wm??'—';$('hWn').textContent=wn??'—';
+  const ms=morningSeries();
+  if(ms.length){const w=ms[ms.length-1].v;$('hGoal').textContent=D.set.goal?Math.max(0,w-D.set.goal).toFixed(1):'—';
+    if(ms.length>1){const df=w-ms[ms.length-2].v;$('hDiff').textContent=`朝の体重：前回から ${df>0?'+':''}${df.toFixed(1)} kg ${df<=0?'✨':''}`;$('hDiff').style.color=df<=0?'#7bbfa8':'var(--danger)'}}
 }
 ['setKcal','setGoal','setSnack'].forEach(id=>$(id).onchange=()=>{
   D.set.kcal=parseInt($('setKcal').value)||1600;D.set.goal=parseFloat($('setGoal').value)||null;D.set.snackMax=Math.max(0,parseInt($('setSnack').value)||0);
@@ -448,15 +462,15 @@ function renderHome(){
 
 /* ---------- export/import ---------- */
 function exportData(){const b=new Blob([JSON.stringify(D,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kawaii-diet-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
-function importData(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.weights||!j.meals)throw 0;if(!confirm('今のデータを上書きしていい？'))return;D=Object.assign(structuredClone(def),j);D.set=Object.assign({},def.set,j.set);save();toast('読み込んだよ♡');init()}catch(e){toast('ファイルが読めなかったよ')}};r.readAsText(f);inp.value=''}
+function importData(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.weights||!j.meals)throw 0;if(!confirm('今のデータを上書きしていい？'))return;D=migrate(Object.assign(structuredClone(def),j));D.set=Object.assign({},def.set,j.set);save();toast('読み込んだよ♡');init()}catch(e){toast('ファイルが読めなかったよ')}};r.readAsText(f);inp.value=''}
 
 /* ---------- init ---------- */
 function render(){renderHome();renderWeight();renderMeals();renderSnacks();renderEx()}
-function init(){
+function init(){save();
   ['wDate','mDate','eDate'].forEach(id=>$(id).value=today());
   $('mDate').onchange=renderMeals;$('eDate').onchange=renderEx;
   $('setKcal').value=D.set.kcal;$('setGoal').value=D.set.goal||'';$('setSnack').value=D.set.snackMax;
-  const h=new Date().getHours();$('mType').value=h<10?'朝ごはん':h<15?'昼ごはん':h<22?'夜ごはん':'夜食';
+  const h=new Date().getHours();$('wSlot').value=(h>=15||h<4)?'n':'m';$('mType').value=h<10?'朝ごはん':h<15?'昼ごはん':h<22?'夜ごはん':'夜食';
   calcEx();render();renderCharas(false);
 }
 init();
